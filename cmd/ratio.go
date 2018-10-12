@@ -27,9 +27,7 @@ var ratioCmd = &cobra.Command{
 		}
 
 		t := time.Now().Add(-24 * time.Hour * time.Duration(daysAgo))
-		fmt.Printf("%d-%02d-%02d\n", t.Year(), t.Month(), t.Day())
-
-		fmt.Println(r.String())
+		fmt.Printf("%d-%02d-%02d\t%d\t%d\n", t.Year(), t.Month(), t.Day(), r.Numerator, r.Denominator)
 	},
 }
 
