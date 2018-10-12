@@ -2,14 +2,14 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"path/filepath"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -33,33 +33,26 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	home, err := homedir.Dir()
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	cfgDefault := filepath.Join(home, ".config/slack-stats.yaml")
+
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.empty.yaml)")
+	rootCmd.PersistentFlags().String("config", cfgDefault, fmt.Sprintf("config file (default is %v)", cfgDefault))
 	rootCmd.PersistentFlags().StringP("token", "t", "", "Slack API token (generate here: https://api.slack.com/custom-integrations/legacy-tokens)")
 
-	rootCmd.MarkPersistentFlagRequired("token")
+	viper.BindPFlag("token", rootCmd.PersistentFlags().Lookup("token"))
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		// Search config in home directory with name ".empty" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".empty")
-	}
-
+	cfgFile := rootCmd.PersistentFlags().Lookup("config").Value.String()
+	viper.SetConfigFile(cfgFile)
+	viper.SetEnvPrefix("SLACK_STATS")
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.

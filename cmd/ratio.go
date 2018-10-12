@@ -5,7 +5,9 @@ import (
 	"log"
 
 	"github.com/royvandewater/slack-stats/ratio"
+	"github.com/royvandewater/slack-stats/slack"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // ratioCmd represents the ratio command
@@ -14,15 +16,20 @@ var ratioCmd = &cobra.Command{
 	Short: "Return a ratio of questions to statements.",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		token := cmd.Flag("token").Value.String()
-		channel := cmd.Flag("channel").Value.String()
-		user := cmd.Flag("user").Value.String()
+		token := viper.GetString("token")
+		channel := viper.GetString("channel")
+		user := viper.GetString("user")
 
 		r, err := ratio.FindRatio(token, channel, user)
 		if err != nil {
 			log.Fatalln("Error occured: ", err.Error())
 		}
-		fmt.Println(r)
+		m, err := slack.GetUserMessages(token, channel, user)
+		if err != nil {
+			log.Fatalln("Error occured: ", err.Error())
+		}
+
+		fmt.Println(len(m), r)
 	},
 }
 
@@ -36,9 +43,6 @@ func init() {
 	ratioCmd.PersistentFlags().StringP("channel", "c", "", "Slack channel to analyze")
 	ratioCmd.PersistentFlags().StringP("user", "u", "", "Slack user to analyze")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// ratioCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	ratioCmd.MarkPersistentFlagRequired("channel")
-	ratioCmd.MarkPersistentFlagRequired("user")
+	viper.BindPFlag("channel", ratioCmd.PersistentFlags().Lookup("channel"))
+	viper.BindPFlag("user", ratioCmd.PersistentFlags().Lookup("user"))
 }

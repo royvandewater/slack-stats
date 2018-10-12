@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/BenLubar/memoize"
 	"github.com/pkg/errors"
 )
 
@@ -15,7 +16,7 @@ type Message struct {
 	User string `json:"user"`
 }
 
-func getMessages(token, channel string) ([]Message, error) {
+func getMessagesUnmemoized(token, channel string) ([]Message, error) {
 	slackURL, err := url.Parse("https://slack.com/api/channels.history")
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to parse URL")
@@ -41,14 +42,25 @@ func getMessages(token, channel string) ([]Message, error) {
 		return nil, fmt.Errorf("Non 200 status code returned: %v", resp.StatusCode)
 	}
 
-	messages := make([]Message, 0)
-	err = json.NewDecoder(resp.Body).Decode(&messages)
+	parsed := struct {
+		Messages []Message `json:"messages"`
+		OK       bool      `json:"ok"`
+		Error    string    `json:"error"`
+	}{}
+
+	err = json.NewDecoder(resp.Body).Decode(&parsed)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to decode response")
 	}
 
-	return messages, nil
+	if !parsed.OK {
+		return nil, fmt.Errorf("Received error from slack: %v", parsed.Error)
+	}
+
+	return parsed.Messages, nil
 }
+
+var getMessages = memoize.Memoize(getMessagesUnmemoized).(func(string, string) ([]Message, error))
 
 // GetUserMessages retrieves messages from a particular user in a channel
 func GetUserMessages(token, channel, user string) ([]Message, error) {
