@@ -1,31 +1,41 @@
 package ratio
 
 import (
-	"math/big"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/royvandewater/slack-stats/slack"
 )
 
+// Ratio represents the ratio of questions to statements
+type Ratio struct {
+	Numerator   int
+	Denominator int
+}
+
+func (r *Ratio) String() string {
+	return fmt.Sprintf("%v / %v", r.Numerator, r.Denominator)
+}
+
 func isQuestion(text string) bool {
 	return strings.Contains(text, "?")
 }
 
-// FindRatio retrieves the ratio of questions to statments for a user in
+// FindRatio retrieves the ratio of questions to statements for a user in
 // a slack channel
-func FindRatio(token, channel, user string) (*big.Rat, error) {
+func FindRatio(token, channel, user string) (*Ratio, error) {
 	messages, err := slack.GetUserMessages(token, channel, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to getUserMessages")
 	}
 
-	numQuestions := int64(0)
+	numQuestions := 0
 	for _, message := range messages {
 		if isQuestion(message.Text) {
 			numQuestions++
 		}
 	}
 
-	return big.NewRat(numQuestions, int64(len(messages))), nil
+	return &Ratio{numQuestions, len(messages)}, nil
 }

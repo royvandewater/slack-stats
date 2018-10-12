@@ -24,6 +24,7 @@ func getMessagesUnmemoized(token, channel string) ([]Message, error) {
 
 	query := slackURL.Query()
 	query.Add("channel", channel)
+	query.Add("count", "1000")
 
 	slackURL.RawQuery = query.Encode()
 

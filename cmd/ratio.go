@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/royvandewater/slack-stats/ratio"
-	"github.com/royvandewater/slack-stats/slack"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -24,12 +23,8 @@ var ratioCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalln("Error occured: ", err.Error())
 		}
-		m, err := slack.GetUserMessages(token, channel, user)
-		if err != nil {
-			log.Fatalln("Error occured: ", err.Error())
-		}
 
-		fmt.Println(len(m), r)
+		fmt.Println(r.String())
 	},
 }
 
