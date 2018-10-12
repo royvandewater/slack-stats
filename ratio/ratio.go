@@ -24,8 +24,8 @@ func isQuestion(text string) bool {
 
 // FindRatio retrieves the ratio of questions to statements for a user in
 // a slack channel
-func FindRatio(token, channel, user string) (*Ratio, error) {
-	messages, err := slack.GetUserMessages(token, channel, user)
+func FindRatio(token, channel, user string, daysAgo int) (*Ratio, error) {
+	messages, err := slack.GetUserMessages(token, channel, user, daysAgo)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to getUserMessages")
 	}
