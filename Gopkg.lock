@@ -2,14 +2,6 @@
 
 
 [[projects]]
-  branch = "master"
-  digest = "1:79b85f72444a751ab052e3d381f4a7db34b8ce9220c6223f839452e3fd8ac9cb"
-  name = "github.com/BenLubar/memoize"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "6fdb23a94b2412102e3e791f13122f440a2b8cd5"
-
-[[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
@@ -170,7 +162,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/BenLubar/memoize",
     "github.com/mitchellh/go-homedir",
     "github.com/pkg/errors",
     "github.com/spf13/cobra",

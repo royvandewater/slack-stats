@@ -25,7 +25,8 @@ func endTime(now time.Time, daysAgo int) time.Time {
 	return startTime(now, daysAgo).Add(24 * time.Hour)
 }
 
-func getMessages(token, channel string, daysAgo int) ([]Message, error) {
+// GetMessages retrieves messages in a channel
+func GetMessages(token, channel string, daysAgo int) ([]Message, error) {
 	slackURL, err := url.Parse("https://slack.com/api/channels.history")
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to parse URL")
@@ -75,7 +76,7 @@ func getMessages(token, channel string, daysAgo int) ([]Message, error) {
 
 // GetUserMessages retrieves messages from a particular user in a channel
 func GetUserMessages(token, channel, user string, daysAgo int) ([]Message, error) {
-	allMessages, err := getMessages(token, channel, daysAgo)
+	allMessages, err := GetMessages(token, channel, daysAgo)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to getMessages")
 	}

@@ -1,4 +1,4 @@
-package ratio
+package questionratio
 
 import (
 	"fmt"
