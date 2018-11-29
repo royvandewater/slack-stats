@@ -18,9 +18,9 @@ var userRatioCommand = &cobra.Command{
 	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		token := viper.GetString("token")
-		channel := viper.GetString("channel")
-		user := viper.GetString("user")
-		daysAgo := viper.GetInt("days-ago")
+		channel := viper.GetString("user.channel")
+		user := viper.GetString("user.user")
+		daysAgo := viper.GetInt("user.days-ago")
 
 		r, err := userratio.FindRatio(token, channel, user, daysAgo)
 		if err != nil {
@@ -41,9 +41,9 @@ func init() {
 	// and all subcommands, e.g.:
 	userRatioCommand.PersistentFlags().StringP("channel", "c", "", "Slack channel to analyze")
 	userRatioCommand.PersistentFlags().StringP("user", "u", "", "Slack user to analyze")
-	userRatioCommand.PersistentFlags().IntP("days-ago", "d", 1, "Days ago the day was to aggregate. 0 aggregates today, 1 yesterday, etc.")
+	userRatioCommand.PersistentFlags().IntP("days-ago", "d", 3, "Days ago the day was to aggregate. 0 aggregates today, 1 yesterday, etc.")
 
-	viper.BindPFlag("channel", userRatioCommand.PersistentFlags().Lookup("channel"))
-	viper.BindPFlag("user", userRatioCommand.PersistentFlags().Lookup("user"))
-	viper.BindPFlag("days-ago", userRatioCommand.PersistentFlags().Lookup("days-ago"))
+	viper.BindPFlag("user.channel", userRatioCommand.PersistentFlags().Lookup("channel"))
+	viper.BindPFlag("user.user", userRatioCommand.PersistentFlags().Lookup("user"))
+	viper.BindPFlag("user.days-ago", userRatioCommand.PersistentFlags().Lookup("days-ago"))
 }
