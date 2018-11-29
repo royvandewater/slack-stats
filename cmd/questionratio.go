@@ -10,8 +10,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// questionRatioCmd represents the ratio command
-var questionRatioCmd = &cobra.Command{
+// questionRatioCommand represents the ratio command
+var questionRatioCommand = &cobra.Command{
 	Use:     "question-ratio",
 	Aliases: []string{"q"},
 	Short:   "Return a ratio of questions to statements.",
@@ -33,17 +33,17 @@ var questionRatioCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(questionRatioCmd)
+	rootCmd.AddCommand(questionRatioCommand)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	questionRatioCmd.PersistentFlags().StringP("channel", "c", "", "Slack channel to analyze")
-	questionRatioCmd.PersistentFlags().StringP("user", "u", "", "Slack user to analyze")
-	questionRatioCmd.PersistentFlags().IntP("days-ago", "d", 2, "Days ago the day was to aggregate. 0 aggregates today, 1 yesterday, etc.")
+	questionRatioCommand.PersistentFlags().StringP("channel", "c", "", "Slack channel to analyze")
+	questionRatioCommand.PersistentFlags().StringP("user", "u", "", "Slack user to analyze")
+	questionRatioCommand.PersistentFlags().IntP("days-ago", "d", 2, "Days ago the day was to aggregate. 0 aggregates today, 1 yesterday, etc.")
 
-	viper.BindPFlag("question.channel", questionRatioCmd.PersistentFlags().Lookup("channel"))
-	viper.BindPFlag("question.user", questionRatioCmd.PersistentFlags().Lookup("user"))
-	viper.BindPFlag("question.days-ago", questionRatioCmd.PersistentFlags().Lookup("days-ago"))
+	viper.BindPFlag("question.channel", questionRatioCommand.PersistentFlags().Lookup("channel"))
+	viper.BindPFlag("question.user", questionRatioCommand.PersistentFlags().Lookup("user"))
+	viper.BindPFlag("question.days-ago", questionRatioCommand.PersistentFlags().Lookup("days-ago"))
 }
