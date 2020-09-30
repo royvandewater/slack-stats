@@ -19,11 +19,6 @@ var verifyHubotCommand = &cobra.Command{
 		token := viper.GetString("token")
 		channel := viper.GetString("question.channel")
 
-		err := slack.PostInChannel(token, channel, "Hello World")
-		if err != nil {
-			log.Fatalln("Error occured: ", err.Error())
-		}
-
 		commands, err := verifyhubot.VerifyHubot(token, channel)
 		if err != nil {
 			log.Fatalln("Error occured: ", err.Error())

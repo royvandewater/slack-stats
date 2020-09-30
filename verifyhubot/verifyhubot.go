@@ -18,7 +18,7 @@ func isHubot(user string) bool {
 }
 
 func isSuccess(text string) bool {
-	return !strings.Contains(text, ":trial nil")
+	return strings.Contains(text, ":trial {")
 }
 
 // VerifyHubot verifies that a hubot command
