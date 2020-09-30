@@ -5,39 +5,35 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
+	"io/ioutil"
 
 	"github.com/pkg/errors"
 )
+
+// File is a file attached to a message
+type File struct {
+	URLPrivateDownload string `json:"url_private_download"`
+	Title string `json:"title"`
+}
 
 // Message is a slack message
 type Message struct {
 	Text string `json:"text"`
 	User string `json:"user"`
-}
-
-func startTime(now time.Time, daysAgo int) time.Time {
-	t := now.Add(-24 * time.Hour * time.Duration(daysAgo))
-	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.Local)
-}
-
-func endTime(now time.Time, daysAgo int) time.Time {
-	return startTime(now, daysAgo).Add(24 * time.Hour)
+	Files []File `json:"files"`
 }
 
 // GetMessages retrieves messages in a channel
 func GetMessages(token, channel string, daysAgo int) ([]Message, error) {
-	slackURL, err := url.Parse("https://slack.com/api/channels.history")
+	slackURL, err := url.Parse("https://slack.com/api/conversations.history")
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to parse URL")
 	}
 
-	now := time.Now()
+	// now := time.Now()
 	query := slackURL.Query()
 	query.Add("channel", channel)
 	query.Add("count", "1000")
-	query.Add("oldest", fmt.Sprintf("%v.000100", startTime(now, daysAgo).Unix()))
-	query.Add("latest", fmt.Sprintf("%v.000100", endTime(now, daysAgo).Unix()))
 
 	slackURL.RawQuery = query.Encode()
 
@@ -88,4 +84,35 @@ func GetUserMessages(token, channel, user string, daysAgo int) ([]Message, error
 		}
 	}
 	return messages, nil
+}
+
+func GetFileContents(token, urlPrivateDownload string) (string, error) {
+	slackURL, err := url.Parse(urlPrivateDownload)
+	if err != nil {
+		return "", errors.Wrap(err, "Failed to parse URL")
+	}
+
+
+	req, err := http.NewRequest("GET", slackURL.String(), nil)
+	if err != nil {
+		return "", errors.Wrap(err, "Failed to create request")
+	}
+
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %v", token))
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", errors.Wrap(err, "Failed to Do request")
+	}
+
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("Non 200 status code returned: %v", resp.StatusCode)
+	}
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", errors.Wrap(err, "Failed to read the response body")
+	}
+
+	return string(data), nil
 }
